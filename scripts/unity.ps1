@@ -12,4 +12,3 @@ if (-not (Test-Path -LiteralPath $unityCliPath -PathType Leaf)) {
 }
 
 & $unityCliPath $Command @UnityArguments
-exit $LASTEXITCODE
