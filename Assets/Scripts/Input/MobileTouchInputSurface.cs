@@ -33,6 +33,13 @@ namespace JannahGarden.Input
 
         private void OnEnable()
         {
+            if (cameraOrbit != null)
+            {
+                Vector3 angles = cameraOrbit.localEulerAngles;
+                yaw = angles.y;
+                pitch = NormalizePitch(angles.x);
+            }
+
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.PauseChanged += OnPauseChanged;
         }

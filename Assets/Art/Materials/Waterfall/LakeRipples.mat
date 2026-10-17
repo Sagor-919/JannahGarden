@@ -29,7 +29,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
@@ -61,14 +61,14 @@ Material:
     m_Floats:
     - _DissolveAmount: 0.4
     - _DissolvePower: 5
-    - _DistortionAmount: 0.1
+    - _DistortionAmount: 3.49
     - _QueueControl: 0
     - _QueueOffset: 0
     - _VoronoiScale: 10
     - _XRMotionVectorsPass: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ScrollSpeed: {r: 0, g: 0.3, b: 0, a: 0}
-    - _VoronoiSpeed: {r: 0.4, g: 0.4, b: 0, a: 0}
+    - _Color: {r: 0.6280881, g: 0.78511006, b: 0.93722516, a: 0.35686275}
+    - _ScrollSpeed: {r: 0, g: 0.1, b: 0, a: 0}
+    - _VoronoiSpeed: {r: 0.1, g: 0.43, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

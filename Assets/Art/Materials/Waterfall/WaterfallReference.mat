@@ -43,28 +43,28 @@ Material:
     - _BottomNoiseAmount: 0.65
     - _BottomNoiseScale: 20
     - _BottomStrength: 2
-    - _Bottom_Brightness: 0.9
-    - _Bottom_Foam_Strength: 2
+    - _Bottom_Brightness: 1.27
+    - _Bottom_Foam_Strength: 2.84
     - _Bottom_Noise_Amount: 0.65
     - _Bottom_Noise_Scale: 20
     - _ClipThreshold: 0
     - _DarkFloor: 0.1
-    - _Dark_Value_Remap: 0.1
+    - _Dark_Value_Remap: 0.25
     - _Erosion: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RippleAmount: 3.3
-    - _Ripple_Amount: 3.3
+    - _Ripple_Amount: 4.38
     - _VoronoiScale: 12
     - _VoronoiSpeed: 3
     - _Voronoi_Scale: 12.6
-    - _Voronoi_Speed: 3
+    - _Voronoi_Speed: 6.03
     - _XRMotionVectorsPass: 1
     m_Colors:
     - _RippleSpeed: {r: 0, g: 0.5, b: 0, a: 0}
-    - _Ripple_Speed: {r: 0, g: 0.5, b: 0, a: 0}
+    - _Ripple_Speed: {r: 0, g: 0.6, b: 0, a: 0}
     - _WaterColor: {r: 0.3, g: 0.82, b: 1.2, a: 1.8}
-    - _Water_Color: {r: 0.3, g: 0.82, b: 1.2, a: 1}
+    - _Water_Color: {r: 0.2955117, g: 0.9535175, b: 1.3921882, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7521007516209086181

@@ -1,5 +1,6 @@
 using JannahGarden.Gameplay;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace JannahGarden.Player
 {
@@ -76,33 +77,49 @@ namespace JannahGarden.Player
             if (movementBoundary == null || deltaTime <= 0f)
                 return horizontalVelocity;
 
-            float radius = GetBoundaryRadius() - boundaryInset - characterController.radius;
-            radius = Mathf.Max(0.1f, radius);
+            if (movementBoundary.GetComponent<Unity.AI.Navigation.NavMeshSurface>() == null)
+                return ConstrainToCircle(horizontalVelocity, deltaTime);
+
+            if (!NavMesh.SamplePosition(transform.position, out NavMeshHit start, 0.75f, NavMesh.AllAreas))
+                return Vector3.zero;
+
+            Vector3 nextPosition = start.position + horizontalVelocity * deltaTime;
+            if (!NavMesh.Raycast(start.position, nextPosition, out NavMeshHit edge, NavMesh.AllAreas))
+                return horizontalVelocity;
+
+            // Keep the input parallel to the NavMesh edge. Pulling the controller
+            // back toward an inset point every frame makes it oscillate at seams.
+            Vector3 slide = Vector3.ProjectOnPlane(horizontalVelocity * deltaTime, edge.normal);
+            slide.y = 0f;
+            if (slide.sqrMagnitude < 0.000001f)
+                return Vector3.zero;
+
+            if (NavMesh.Raycast(start.position, start.position + slide, out NavMeshHit slideEdge, NavMesh.AllAreas))
+            {
+                slide = slideEdge.position - start.position;
+                slide.y = 0f;
+                slide *= 0.98f;
+            }
+
+            return slide / deltaTime;
+        }
+
+        private Vector3 ConstrainToCircle(Vector3 horizontalVelocity, float deltaTime)
+        {
+            Renderer boundaryRenderer = movementBoundary.GetComponent<Renderer>();
+            float radius = boundaryRenderer != null
+                ? Mathf.Min(boundaryRenderer.bounds.extents.x, boundaryRenderer.bounds.extents.z)
+                : fallbackBoundaryRadius;
+            radius = Mathf.Max(0.1f, radius - boundaryInset - characterController.radius);
 
             Vector3 center = movementBoundary.position;
-            Vector3 nextPosition = transform.position + horizontalVelocity * deltaTime;
-            Vector2 offset = new Vector2(nextPosition.x - center.x, nextPosition.z - center.z);
+            Vector3 next = transform.position + horizontalVelocity * deltaTime;
+            Vector2 offset = new Vector2(next.x - center.x, next.z - center.z);
             if (offset.sqrMagnitude <= radius * radius)
                 return horizontalVelocity;
 
-            Vector2 clampedOffset = offset.normalized * radius;
-            Vector3 clampedPosition = new Vector3(center.x + clampedOffset.x, nextPosition.y, center.z + clampedOffset.y);
-            return (clampedPosition - transform.position) / deltaTime;
-        }
-
-        private float GetBoundaryRadius()
-        {
-            Renderer boundaryRenderer = movementBoundary.GetComponent<Renderer>();
-            if (boundaryRenderer != null)
-                return Mathf.Min(boundaryRenderer.bounds.extents.x, boundaryRenderer.bounds.extents.z);
-
-            MeshFilter meshFilter = movementBoundary.GetComponent<MeshFilter>();
-            if (meshFilter == null || meshFilter.sharedMesh == null)
-                return fallbackBoundaryRadius;
-
-            Vector3 scale = movementBoundary.lossyScale;
-            Vector3 extents = meshFilter.sharedMesh.bounds.extents;
-            return Mathf.Min(extents.x * Mathf.Abs(scale.x), extents.z * Mathf.Abs(scale.z));
+            Vector2 clamped = offset.normalized * radius;
+            return (new Vector3(center.x + clamped.x, transform.position.y, center.z + clamped.y) - transform.position) / deltaTime;
         }
     }
 }
