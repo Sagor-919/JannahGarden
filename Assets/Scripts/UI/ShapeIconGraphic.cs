@@ -9,7 +9,8 @@ namespace JannahGarden.UI
         {
             Pause,
             Play,
-            Settings
+            Settings,
+            Restart
         }
 
         [SerializeField] private IconShape shape = IconShape.Pause;
@@ -43,10 +44,40 @@ namespace JannahGarden.UI
             {
                 AddTriangle(vertexHelper, rect, new Vector2(0.30f, 0.16f), new Vector2(0.30f, 0.84f), new Vector2(0.82f, 0.50f));
             }
-            else
+            else if (shape == IconShape.Settings)
             {
                 AddGear(vertexHelper, rect);
             }
+            else
+            {
+                AddRestartArrow(vertexHelper, rect);
+            }
+        }
+
+        private void AddRestartArrow(VertexHelper vertexHelper, Rect rect)
+        {
+            const int segments = 20;
+            const float start = -45f * Mathf.Deg2Rad;
+            const float end = 220f * Mathf.Deg2Rad;
+            Vector2 center = new Vector2(0.5f, 0.5f);
+            for (int i = 0; i < segments; i++)
+            {
+                float a = Mathf.Lerp(start, end, (float)i / segments);
+                float b = Mathf.Lerp(start, end, (float)(i + 1) / segments);
+                Vector2 from = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+                Vector2 to = new Vector2(Mathf.Cos(b), Mathf.Sin(b));
+                AddQuad(vertexHelper, rect,
+                    center + from * 0.25f, center + from * 0.36f,
+                    center + to * 0.36f, center + to * 0.25f);
+            }
+
+            Vector2 radial = new Vector2(Mathf.Cos(end), Mathf.Sin(end));
+            Vector2 tangent = new Vector2(-radial.y, radial.x);
+            Vector2 basePoint = center + radial * 0.305f;
+            AddTriangle(vertexHelper, rect,
+                basePoint + radial * 0.13f,
+                basePoint - radial * 0.13f,
+                basePoint + tangent * 0.20f);
         }
 
         private void AddGear(VertexHelper vertexHelper, Rect rect)

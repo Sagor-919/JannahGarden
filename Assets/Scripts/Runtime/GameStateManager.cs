@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace JannahGarden.Gameplay
 {
@@ -59,6 +60,13 @@ namespace JannahGarden.Gameplay
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
+        }
+
+        public void RestartGame()
+        {
+            SetPaused(false);
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void OnApplicationPause(bool paused)

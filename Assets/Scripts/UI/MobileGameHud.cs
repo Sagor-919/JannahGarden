@@ -7,13 +7,15 @@ namespace JannahGarden.UI
     public sealed class MobileGameHud : MonoBehaviour
     {
         [SerializeField] private Button pauseButton;
+        [SerializeField] private Button restartButton;
         [SerializeField] private Button quitButton;
         [SerializeField] private ShapeIconGraphic pausePlayIcon;
         [SerializeField] private Joystick movementJoystick;
 
-        public void Configure(Button pause, Button quit, ShapeIconGraphic icon, Joystick joystick)
+        public void Configure(Button pause, Button quit, ShapeIconGraphic icon, Joystick joystick, Button restart = null)
         {
             pauseButton = pause;
+            restartButton = restart;
             quitButton = quit;
             pausePlayIcon = icon;
             movementJoystick = joystick;
@@ -23,6 +25,8 @@ namespace JannahGarden.UI
         {
             if (pauseButton != null)
                 pauseButton.onClick.AddListener(TogglePause);
+            if (restartButton != null)
+                restartButton.onClick.AddListener(RestartGame);
             if (quitButton != null)
                 quitButton.onClick.AddListener(QuitGame);
 
@@ -40,6 +44,8 @@ namespace JannahGarden.UI
         {
             if (pauseButton != null)
                 pauseButton.onClick.RemoveListener(TogglePause);
+            if (restartButton != null)
+                restartButton.onClick.RemoveListener(RestartGame);
             if (quitButton != null)
                 quitButton.onClick.RemoveListener(QuitGame);
 
@@ -62,6 +68,12 @@ namespace JannahGarden.UI
                 GameStateManager.Instance.QuitGame();
             else
                 Application.Quit();
+        }
+
+        private void RestartGame()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.RestartGame();
         }
 
         private void OnPauseChanged(bool isPaused)

@@ -10,6 +10,7 @@ namespace JannahGarden.Player
         [SerializeField] private Transform movementBoundary;
         [SerializeField] private Camera movementCamera;
         [SerializeField] private Transform characterVisual;
+        [SerializeField] private Collider walkableGround;
         [SerializeField, Min(0f)] private float moveSpeed = 3.5f;
         [SerializeField] private float gravity = -20f;
         [SerializeField, Min(0f)] private float boundaryInset = 0.05f;
@@ -17,10 +18,12 @@ namespace JannahGarden.Player
 
         private CharacterController characterController;
         private float verticalSpeed;
+        private Vector3 lastSupportedPosition;
 
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
+            lastSupportedPosition = transform.position;
         }
 
         public void Configure(Transform boundary, Camera cameraToFollow, Transform visualTransform)
@@ -34,6 +37,12 @@ namespace JannahGarden.Player
         {
             if (GameStateManager.Instance != null && GameStateManager.Instance.IsPaused)
                 return;
+
+            if (transform.position.y < lastSupportedPosition.y - 0.35f)
+            {
+                ReturnToSupportedGround();
+                return;
+            }
 
             Vector2 input = InputManager.Instance != null ? InputManager.Instance.Movement : Vector2.zero;
             input = Vector2.ClampMagnitude(input, 1f);
@@ -53,6 +62,13 @@ namespace JannahGarden.Player
             float deltaTime = Time.deltaTime;
             Vector3 horizontal = direction * moveSpeed;
             horizontal = ConstrainToBoundary(horizontal, deltaTime);
+            if (horizontal.sqrMagnitude > 0.001f && walkableGround != null)
+            {
+                Vector3 next = transform.position + horizontal * deltaTime;
+                Vector3 forwardProbe = next + horizontal.normalized * characterController.radius * 0.8f;
+                if (!HasGroundAt(next) || !HasGroundAt(forwardProbe))
+                    horizontal = Vector3.zero;
+            }
 
             if (horizontal.sqrMagnitude > 0.001f)
             {
@@ -70,6 +86,28 @@ namespace JannahGarden.Player
             CollisionFlags collisions = characterController.Move(velocity * deltaTime);
             if ((collisions & CollisionFlags.Below) != 0 && verticalSpeed < 0f)
                 verticalSpeed = -2f;
+
+            if (characterController.isGrounded && HasGroundAt(transform.position))
+                lastSupportedPosition = transform.position;
+            else if (transform.position.y < lastSupportedPosition.y - 0.35f)
+                ReturnToSupportedGround();
+        }
+
+        private bool HasGroundAt(Vector3 position)
+        {
+            if (walkableGround == null)
+                return true;
+
+            Ray ray = new Ray(position + Vector3.up * 1.5f, Vector3.down);
+            return walkableGround.Raycast(ray, out _, 3f);
+        }
+
+        private void ReturnToSupportedGround()
+        {
+            characterController.enabled = false;
+            transform.position = lastSupportedPosition;
+            characterController.enabled = true;
+            verticalSpeed = -2f;
         }
 
         private Vector3 ConstrainToBoundary(Vector3 horizontalVelocity, float deltaTime)
