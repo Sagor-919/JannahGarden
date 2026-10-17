@@ -4,12 +4,12 @@ using UnityEngine.EventSystems;
 
 namespace JannahGarden.Input
 {
-    /// <summary>Routes lower-screen touches to a floating joystick and upper-screen drags to the orbit camera.</summary>
+    /// <summary>Routes touches on the fixed joystick to movement and other drags to the camera.</summary>
     public sealed class MobileTouchInputSurface : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         [SerializeField] private Joystick movementJoystick;
+        [SerializeField] private RectTransform movementTouchArea;
         [SerializeField] private Transform cameraOrbit;
-        [SerializeField, Range(0.1f, 0.5f)] private float movementZoneHeight = 0.3f;
         [SerializeField, Min(0.01f)] private float lookDegreesPerPixel = 0.18f;
         [SerializeField] private float minimumPitch = -10f;
         [SerializeField] private float maximumPitch = 70f;
@@ -22,6 +22,7 @@ namespace JannahGarden.Input
         public void Configure(Joystick joystick, Transform orbit)
         {
             movementJoystick = joystick;
+            movementTouchArea = joystick != null ? joystick.transform.Find("Background") as RectTransform : null;
             cameraOrbit = orbit;
             if (cameraOrbit != null)
             {
@@ -33,6 +34,9 @@ namespace JannahGarden.Input
 
         private void OnEnable()
         {
+            if (movementTouchArea == null && movementJoystick != null)
+                movementTouchArea = movementJoystick.transform.Find("Background") as RectTransform;
+
             if (cameraOrbit != null)
             {
                 Vector3 angles = cameraOrbit.localEulerAngles;
@@ -56,7 +60,8 @@ namespace JannahGarden.Input
             if (GameStateManager.Instance != null && GameStateManager.Instance.IsPaused)
                 return;
 
-            if (eventData.position.y <= Screen.height * movementZoneHeight)
+            if (movementTouchArea != null && RectTransformUtility.RectangleContainsScreenPoint(
+                    movementTouchArea, eventData.position, eventData.pressEventCamera))
             {
                 if (movementPointerId != int.MinValue || movementJoystick == null)
                     return;

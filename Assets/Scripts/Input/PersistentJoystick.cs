@@ -16,6 +16,7 @@ namespace JannahGarden.Input
             if (backgroundGroup == null)
                 backgroundGroup = background.gameObject.AddComponent<CanvasGroup>();
             backgroundGroup.alpha = 0.5f;
+            backgroundGroup.blocksRaycasts = false;
         }
 
         public override void OnPointerDown(PointerEventData eventData)
@@ -28,6 +29,7 @@ namespace JannahGarden.Input
         public override void OnPointerUp(PointerEventData eventData)
         {
             base.OnPointerUp(eventData);
+            background.gameObject.SetActive(true);
             if (backgroundGroup != null)
                 backgroundGroup.alpha = 0.5f;
         }
